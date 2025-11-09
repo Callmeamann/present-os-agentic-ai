@@ -2,12 +2,10 @@ import google.generativeai as genai
 from app.core.config import settings
 import json
 from app.models.goal import GoalInDB
-import datetime # Import datetime to pass current time to AI
+import datetime
 
-# Configure the Gemini client
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
-# Use gemini-2.5-flash-preview-09-2025, it's fast, cheap, and supports JSON mode
 model = genai.GenerativeModel(
     'gemini-2.5-flash-preview-09-2025',
     generation_config={"response_mime_type": "application/json"}
@@ -106,7 +104,6 @@ class SchedulingSkill:
     ) -> dict:
         """Calls the Gemini API to generate a structured calendar event."""
         
-        # Get the current time in UTC ISO format to give the AI context
         current_time_utc = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
         system_instruction = SchedulingSkill._get_paei_system_prompt(
@@ -122,19 +119,16 @@ class SchedulingSkill:
             json_text = response.text
             event_data = json.loads(json_text)
             
-            # Updated validation to check for our new required keys
             required_keys = ['title', 'description', 'duration_minutes', 'start_time_iso']
             if not all(k in event_data for k in required_keys):
                 print(f"AI response missing keys: {event_data}")
                 raise ValueError("AI response missing required JSON keys.")
             
-            # Ensure recurrence_rrule exists, even if it's null
             if 'recurrence_rrule' not in event_data:
-                event_data['recurrence_rrule'] = None # Default to null if missing
+                event_data['recurrence_rrule'] = None 
                 
             return event_data
 
         except Exception as e:
             print(f"Error calling Gemini API for scheduling: {e}")
-            # Re-raise a specific error for the service to catch
             raise ValueError(f"AI JSON generation failed: {str(e)}")

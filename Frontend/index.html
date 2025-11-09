@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-900">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Present OS</title>
+    <!-- Google Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script defer src="https://unpkg.com/lucide-react@latest/dist/umd/lucide.min.js"></script>
+    <!-- Feather Icons (Replaced Lucide) -->
+    <script src="https://unpkg.com/feather-icons"></script>
     
     <!-- === THIS IS THE V9 FIREBASE SDK === -->
-    <!-- We load our (git-ignored) config file first -->
-    <script src="firebase-config.js"></script> 
-    
-    <!-- Import the v9 SDKs (as modules) -->
+    <script src="firebase-config.js"></script>  
     <script type="module">
-        // Make the v9 SDKs globally available for our main.js
-        // This is a simple way to use modules without a build tool
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         
@@ -28,16 +28,15 @@
     <!-- === END OF V9 SDK === -->
 
     <link rel="stylesheet" href="style.css">
-    <!-- Load our main app logic *after* the SDKs -->
     <script src="main.js" defer></script>
 
 </head>
-<body class="h-full font-sans antialiased text-gray-200">
+<body class="h-full font-sans antialiased text-gray-200 bg-gradient-to-br from-gray-900 to-gray-800">
     <div id="app-root" class="h-full">
 
         <!-- ===== SCREEN 1: LOGIN (Visible by default) ===== -->
         <div id="login-screen" class="flex items-center justify-center h-full">
-            <div class="p-10 bg-gray-800 rounded-lg shadow-2xl text-center max-w-md w-full border border-gray-700">
+            <div class="p-10 bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-2xl text-center max-w-md w-full border border-gray-700">
                 <h1 class="text-3xl font-bold text-white mb-6">Present OS</h1>
                 <p class="text-gray-400 mb-8">Your AI partner for a purpose-driven life.</p>
                 <button id="sign-in-btn" class="flex items-center justify-center w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg hover:shadow-xl">
@@ -52,8 +51,8 @@
         <div id="dashboard-screen" class="hidden h-full flex flex-col">
             
             <!-- Navbar (Profile-based) -->
-            <nav class="bg-gray-800 shadow-sm border-b border-gray-700">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="bg-gray-800/80 backdrop-blur-sm shadow-sm border-b border-gray-700 z-10 sticky top-0">
+                <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between h-16">
                         <div class="flex items-center">
                             <span class="text-2xl font-bold text-indigo-400">Present OS</span>
@@ -62,7 +61,7 @@
                             <span id="user-profile-name" class="font-medium text-gray-300 mr-3 hidden sm:block">User Name</span>
                             <img id="user-profile-pic" class="w-10 h-10 rounded-full mr-4" src="https://placehold.co/40x40/374151/9CA3AF?text=User" alt="User Profile">
                             <button id="sign-out-btn" title="Sign Out" class="p-2 bg-gray-700 text-gray-400 rounded-lg hover:bg-gray-600 hover:text-white transition">
-                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                                <i data-feather="log-out" class="w-5 h-5"></i>
                             </button>
                         </div>
                     </div>
@@ -70,73 +69,142 @@
             </nav>
 
             <!-- Main Content Area -->
-            <main class="flex-1 p-4 md:p-8 bg-gray-900 overflow-y-auto">
-                <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <main class="flex-1 flex overflow-hidden"> 
+                <!-- NEW: Sidebar for Tab Switching -->
+                <aside class="w-20 flex-shrink-0 bg-gray-800/60 p-3 space-y-4 flex flex-col items-center border-r border-gray-700">
+                    <button data-tab="schedule" class="tab-switcher w-12 h-12 flex items-center justify-center rounded-xl bg-indigo-600 text-white" title="Schedule Task">
+                        <i data-feather="calendar" class="w-6 h-6"></i>
+                    </button>
+                    <button data-tab="email" class="tab-switcher w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-700 hover:text-white" title="Draft Email (Soon)">
+                        <i data-feather="mail" class="w-6 h-6"></i>
+                    </button>
+                    <button data-tab="settings" class="tab-switcher w-12 h-12 flex items-center justify-center rounded-xl text-gray-400 hover:bg-gray-700 hover:text-white" title="Settings (Soon)">
+                        <i data-feather="settings" class="w-6 h-6"></i>
+                    </button>
+                </aside>
 
-                    <!-- Column 1: My Goals (Purpose) -->
-                    <div class="lg:col-span-1 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-                        <h2 class="text-2xl font-bold text-white mb-6">My Goals (Purpose)</h2>
-                        
-                        <!-- Add Goal Form -->
-                        <form id="add-goal-form" class="mb-6 pb-6 border-b border-gray-700">
-                            <h3 class="text-lg font-semibold mb-3 text-white">Add New Goal</h3>
-                            <div class="space-y-4">
-                                <input id="goal-name" type="text" placeholder="Goal Name (e.g., Get Healthy)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <input id="goal-avatar" type="text" placeholder="Avatar (e.g., Warrior)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center justify-center">
-                                    <i data-lucide="plus" class="w-5 h-5 mr-2"></i>
-                                    Add Goal
+                <!-- NEW: Scrollable content area -->
+                <div class="flex-1 overflow-y-auto p-4 md:p-8">
+                    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                        <!-- Column 1: My Goals (Purpose) -->
+                        <div class="lg:col-span-1 bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-700 h-fit transition-all duration-300 hover:border-indigo-500/50">
+                            
+                            <!-- UPDATED: Header with Add Button -->
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold text-white">My Goals (Purpose)</h2>
+                                <button id="show-add-goal-btn" title="Add New Goal" class="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                                    <i data-feather="plus" class="w-5 h-5"></i>
                                 </button>
                             </div>
-                        </form>
-
-                        <!-- Goal List -->
-                        <div id="goals-list" class="space-y-4">
-                            <!-- Goals will be injected here by JS -->
-                            <p class="text-gray-400">Loading goals...</p>
-                        </div>
-                    </div>
-
-                    <!-- Column 2: Schedule Action (Action) -->
-                    <div class="lg:col-span-2 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-                        <h2 class="text-2xl font-bold text-white mb-6">Schedule an Action</h2>
-                        
-                        <form id="schedule-action-form" class="space-y-6">
-                            <textarea id="task-prompt" placeholder="What's the task? (e.g., Go to the gym for 1 hour tomorrow)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3"></textarea>
                             
-                            <div>
-                                <label for="goal-select" class="block text-sm font-medium text-gray-300 mb-2">Select a Goal:</label>
-                                <select id="goal-select" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                    <option value="">Select a goal</option>
-                                    <!-- Goal options will be injected here by JS -->
-                                </select>
-                            </div>
+                            <!-- UPDATED: Add Goal Form (Hidden by default) -->
+                            <form id="add-goal-form" class="hidden mb-6 pb-6 border-b border-gray-700">
+                                <h3 class="text-lg font-semibold mb-3 text-white">Add New Goal</h3>
+                                <div class="space-y-4">
+                                    <input id="goal-name" type="text" placeholder="Goal Name (e.g., Get Healthy)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <input id="goal-avatar" type="text" placeholder="Avatar (e.g., Warrior)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <div class="flex space-x-2">
+                                        <button id="cancel-add-goal-btn" type="button" class="w-full px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-500 transition">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center justify-center">
+                                            <i data-feather="check" class="w-5 h-5 mr-2"></i>
+                                            Save Goal
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-300 mb-2">Select Personality (PAEI):</label>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                    <button type="button" data-personality="P" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 focus:bg-indigo-600 focus:text-white transition bg-indigo-600">P (Producer)</button>
-                                    <button type="button" data-personality="A" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 focus:bg-indigo-600 focus:text-white transition">A (Admin)</button>
-                                    <button type="button" data-personality="E" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 focus:bg-indigo-600 focus:text-white transition">E (Entrepreneur)</button>
-                                    <button type="button" data-personality="I" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 focus:bg-indigo-600 focus:text-white transition">I (Integrator)</button>
+                            <!-- Goal List -->
+                            <div id="goals-list" class="space-y-4">
+                                <p class="text-gray-400">Loading goals...</p>
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Action Panels -->
+                        <div class="lg:col-span-2">
+
+                            <!-- PANEL 1: Schedule Action (Action) -->
+                            <div id="schedule-action-panel" class="action-panel">
+                                <div class="bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-700 transition-all duration-300 hover:border-indigo-500/50">
+                                    <h2 class="text-2xl font-bold text-white mb-6">Schedule an Action</h2>
+                                    
+                                    <form id="schedule-action-form" class="space-y-6">
+                                        <textarea id="task-prompt" placeholder="What's the task? (e.g., Go to the gym for 1 hour tomorrow)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3"></textarea>
+                                        
+                                        <div>
+                                            <label for="goal-select" class="block text-sm font-medium text-gray-300 mb-2">Select a Goal:</label>
+                                            <select id="goal-select" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                                <option value="">Select a goal</option>
+                                                <!-- Goal options will be injected here by JS -->
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-300 mb-2">Select Personality (PAEI):</label>
+                                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                                <button type="button" data-personality="P" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold transition bg-indigo-600 text-white">P (Producer)</button>
+                                                <button type="button" data-personality="A" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 transition">A (Admin)</button>
+                                                <button type="button" data-personality="E" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 transition">E (Entrepreneur)</button>
+                                                <button type="button" data-personality="I" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 transition">I (Integrator)</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <p id="permission-status" class="text-yellow-500 text-sm">Checking calendar connection...</p>
+
+                                        <button type="submit" class="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center text-lg">
+                                            <i data-feather="calendar" class="w-5 h-5 mr-2"></i>
+                                            Schedule Action
+                                        </button>
+                                        
+                                        <div id="schedule-status" class="mt-2 text-sm">
+                                            <!-- Success/Error messages will be injected here -->
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                            
-                            <p id="permission-status" class="text-yellow-500 text-sm">Checking calendar connection...</p>
 
-                            <button type="submit" class="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center text-lg">
-                                <i data-lucide="calendar-plus" class="w-5 h-5 mr-2"></i>
-                                Schedule Action
-                            </button>
-                            
-                            <div id="schedule-status" class="mt-2 text-sm">
-                                <!-- Success/Error messages will be injected here -->
+                            <!-- PANEL 2: Email Action (Placeholder) -->
+                            <div id="email-action-panel" class="action-panel hidden">
+                                <div class="bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-700 transition-all duration-300 hover:border-indigo-500/50">
+                                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                                        <i data-feather="mail" class="w-6 h-6 mr-3 text-indigo-400"></i>
+                                        Draft an Email
+                                    </h2>
+                                    <p class="text-gray-400">This AI skill is coming soon!</p>
+                                    <p class="text-gray-400 mt-2">You'll be able to draft emails aligned with your goals and personality.</p>
+                                </div>
                             </div>
-                        </form>
 
+                            <!-- PANEL 3: Settings (Placeholder) -->
+                            <div id="settings-action-panel" class="action-panel hidden">
+                                <div class="bg-gray-800/80 backdrop-blur-sm p-6 rounded-lg shadow-lg border border-gray-700 transition-all duration-300 hover:border-indigo-500/50">
+                                    <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                                        <i data-feather="settings" class="w-6 h-6 mr-3 text-indigo-400"></i>
+                                        Settings
+                                    </h2>
+                                    <p class="text-gray-400">Future settings will go here.</p>
+                                    <p class="text-gray-400 mt-2">Manage permissions, themes, or other preferences.</p>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- ===== NEW: Logout Confirmation Modal ===== -->
+    <div id="logout-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="text-xl font-semibold text-white mb-4">Log Out</h3>
+            <p class="text-gray-300 mb-6">Are you sure you want to sign out?</p>
+            <div class="flex justify-end space-x-4">
+                <button id="cancel-logout-btn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition">Cancel</button>
+                <button id="confirm-logout-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Log Out</button>
+            </div>
         </div>
     </div>
 

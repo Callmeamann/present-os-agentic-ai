@@ -1,15 +1,51 @@
-/* This file is for simple, global styles that Tailwind doesn't handle by default.
-We'll use it to manage our "screen" visibility.
-*/
+/* Set the default font for the entire app */
+html {
+    font-family: 'Inter', sans-serif;
+}
 
 #login-screen.hidden,
-#dashboard-screen.hidden {
+#dashboard-screen.hidden,
+.action-panel.hidden {
     display: none;
 }
 
-/* A helper class to show a selected personality button */
-.personality-button.selected {
-    background-color: #DBEAFE; /* Tailwind's blue-100 */
-    border-color: #2563EB; /* Tailwind's blue-600 */
-    color: #1E40AF; /* Tailwind's blue-800 */
+/* NEW: Styling for sidebar tab switchers */
+.tab-switcher {
+    transition: all 0.2s ease-in-out;
+}
+.tab-switcher:hover {
+    transform: scale(1.05); /* Animation */
+    color: #ffffff; /* text-white */
+}
+.tab-switcher.active {
+    background-color: #4f46e5; /* bg-indigo-600 */
+    color: #ffffff; /* text-white */
+    box-shadow: 0 0 15px rgba(79, 70, 229, 0.5); /* Add a glow effect */
+}
+
+/* NEW: Styling for Logout Confirmation Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    backdrop-filter: blur(5px);
+}
+.modal-overlay.hidden {
+    display: none;
+}
+.modal-content {
+    background-color: #1f2937; /* bg-gray-800 */
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #374151; /* border-gray-700 */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
 }

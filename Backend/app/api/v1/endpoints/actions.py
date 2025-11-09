@@ -1,15 +1,14 @@
 import asyncio
-import datetime  # We need this for timezone and parsing
+import datetime 
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.models.task import ActionRequest
 from app.services.firebase_service import get_user_goal, get_user_google_token
 from app.services.ai_service import AIService
-from app.services.google_service import GoogleService  # This is our "Arm"
+from app.services.google_service import GoogleService  
 from app.core.security import TokenSecurity
 
-# This is the 'router' that api.py is looking for.
 router = APIRouter()
 
 
@@ -48,7 +47,7 @@ async def execute_ai_action(
             payload=ai_payload
         )
     except HTTPException as e:
-        raise e  # Re-raise HTTP exceptions from the service
+        raise e  
     except Exception as e:
         print(f"Error in AI service: {e}")
         raise HTTPException(status_code=500, detail=f"Error in AI service: {e}")
@@ -70,7 +69,6 @@ async def execute_ai_action(
             event_data = ai_result.get("data")
             
             # --- THIS IS THE NEW LOGIC (The "Orchestration") ---
-            # Validate we have the new AI-generated fields
             required_keys = ['title', 'description', 'duration_minutes', 'start_time_iso']
             if not event_data or not all(k in event_data for k in required_keys):
                  raise HTTPException(status_code=500, detail="AI failed to return valid event data.")
@@ -78,40 +76,32 @@ async def execute_ai_action(
             # Get data from AI's plan
             duration_minutes = int(event_data['duration_minutes'])
             start_time_str = event_data['start_time_iso']
-            recurrence_rrule_str = event_data.get('recurrence_rrule') # This is the RRULE string or null
+            recurrence_rrule_str = event_data.get('recurrence_rrule') 
             
-            # Parse the ISO string from the AI
+
             try:
-                # Handle the 'Z' (Zulu) for UTC, which fromisoformat can be picky about
                 if start_time_str.endswith('Z'):
                     start_time_str = start_time_str[:-1] + '+00:00'
                 start_time = datetime.datetime.fromisoformat(start_time_str)
                 
-                # Ensure it's timezone-aware (it should be, but good to double-check)
                 if start_time.tzinfo is None:
                      start_time = start_time.replace(tzinfo=datetime.timezone.utc)
             except ValueError as e:
                 print(f"Error parsing AI-generated start time '{start_time_str}': {e}")
-                # Fallback if AI gives a bad string
                 start_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=1)
             
-            # Calculate end time based on AI's duration
             end_time = start_time + datetime.timedelta(minutes=duration_minutes)
             
-            # Prepare recurrence list for Google API (it expects a list of strings)
             recurrence_list = [f"RRULE:{recurrence_rrule_str}"] if recurrence_rrule_str else None
-            # --- END OF NEW LOGIC ---
 
             # 3d. Create the event
-            # **NOTE**: Your GoogleService.create_calendar_event must be updated
-            # to accept a `recurrence: list[str] | None = None` argument.
             created_event = await GoogleService.create_calendar_event(
                 user_refresh_token=refresh_token,
                 title=event_data.get("title"),
                 description=event_data.get("description"),
-                start_time=start_time, # Pass datetime object
-                end_time=end_time,     # Pass datetime object
-                recurrence=recurrence_list # Pass the new recurrence rule
+                start_time=start_time, 
+                end_time=end_time,     
+                recurrence=recurrence_list 
             )
             
             return {

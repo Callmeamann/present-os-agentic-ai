@@ -23,7 +23,6 @@ class GoogleService:
         """
         Generates the Google OAuth 2.0 URL for the user to visit.
         """
-        # ... existing code ...
         flow = Flow.from_client_config(
             client_config={
                 "web": {
@@ -51,7 +50,6 @@ class GoogleService:
         Exchanges the one-time authorization `code` for an
         `access_token` and `refresh_token`.
         """
-        # ... existing code ...
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 "https://oauth2.googleapis.com/token",
@@ -65,7 +63,6 @@ class GoogleService:
             )
 
         if response.status_code == 200:
-        # ... existing code ...
             tokens = response.json()
             access_token = tokens.get("access_token")
             refresh_token = tokens.get("refresh_token")
@@ -80,9 +77,8 @@ class GoogleService:
         Internal helper to build the Google Calendar service object
         from a refresh token. This is a BLOCKING call.
         """
-        # ... existing code ...
         creds = Credentials(
-            None,  # No access token, we will refresh
+            None,  
             refresh_token=user_refresh_token,
             token_uri="https://oauth2.googleapis.com/token",
             client_id=settings.GOOGLE_CLIENT_ID,
@@ -90,10 +86,8 @@ class GoogleService:
             scopes=GOOGLE_SCOPES,
         )
         
-        # We must refresh the credentials to get a new access token
         creds.refresh(Request())
         
-        # Build the service
         service = build('calendar', 'v3', credentials=creds)
         return service
 
@@ -104,19 +98,17 @@ class GoogleService:
         description: str,
         start_time: datetime.datetime,
         end_time: datetime.datetime,
-        recurrence: Optional[List[str]] = None # <-- MODIFICATION: Added argument
+        recurrence: Optional[List[str]] = None 
     ) -> Dict[str, Any]:
         """
         Creates a new event in the user's primary Google Calendar.
         Runs blocking I/O calls in a separate thread.
         """
         try:
-            # Run blocking I/O in a thread to avoid blocking asyncio loop
             service = await asyncio.to_thread(
                 GoogleService._get_calendar_service, user_refresh_token
             )
             
-            # Convert datetimes to Google's required RFC3339 format
             start_iso = start_time.isoformat()
             end_iso = end_time.isoformat()
             
@@ -133,10 +125,8 @@ class GoogleService:
                 },
             }
             
-            # --- MODIFICATION: Add recurrence if provided ---
             if recurrence:
                 event['recurrence'] = recurrence
-            # --- END MODIFICATION ---
             
             # Call the Calendar API in a thread
             created_event = await asyncio.to_thread(
@@ -150,7 +140,6 @@ class GoogleService:
             return created_event
 
         except HttpError as error:
-        # ... existing code ...
             print(f"An error occurred: {error}")
             raise Exception(f"Google Calendar API error: {error.reason}")
         except Exception as e:

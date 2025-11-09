@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-900">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Present OS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script defer src="https://unpkg.com/lucide-react@latest/dist/umd/lucide.min.js"></script>
+    
+    <!-- === THIS IS THE V9 FIREBASE SDK === -->
+    <!-- We load our (git-ignored) config file first -->
+    <script src="firebase-config.js"></script> 
+    
+    <!-- Import the v9 SDKs (as modules) -->
+    <script type="module">
+        // Make the v9 SDKs globally available for our main.js
+        // This is a simple way to use modules without a build tool
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        
+        window.firebase = {
+            app: { initializeApp },
+            auth: { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut }
+        };
+    </script>
+    <!-- === END OF V9 SDK === -->
+
+    <link rel="stylesheet" href="style.css">
+    <!-- Load our main app logic *after* the SDKs -->
+    <script src="main.js" defer></script>
+
+</head>
+<body class="h-full font-sans antialiased text-gray-200">
+    <div id="app-root" class="h-full">
+
+        <!-- ===== SCREEN 1: LOGIN (Visible by default) ===== -->
+        <div id="login-screen" class="flex items-center justify-center h-full">
+            <div class="p-10 bg-gray-800 rounded-lg shadow-2xl text-center max-w-md w-full border border-gray-700">
+                <h1 class="text-3xl font-bold text-white mb-6">Present OS</h1>
+                <p class="text-gray-400 mb-8">Your AI partner for a purpose-driven life.</p>
+                <button id="sign-in-btn" class="flex items-center justify-center w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-lg hover:shadow-xl">
+                    <!-- Google SVG Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path><path fill="#FF3D00" d="M6.306 14.691c-1.201 1.832-1.94 3.91-1.94 6.13c0 2.22.738 4.298 1.94 6.13l-5.657 5.657A19.951 19.951 0 0 1 0 24c0-4.015 1.192-7.75 3.238-10.828l3.068 5.519z"></path><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.234-5.362l-5.657-5.657c-1.833 1.201-3.91 1.94-6.13 1.94c-4.657 0-8.83-2.932-10.4-7.016l-5.657 5.657C8.243 39.047 15.61 44 24 44z"></path><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.23-2.23 4.14-4.082 5.519l5.657 5.657C41.808 34.018 44 29.42 44 24c0-1.341-.138-2.65-.389-3.917z"></path></svg>
+                    Sign In with Google
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== SCREEN 2: DASHBOARD (Hidden by default) ===== -->
+        <div id="dashboard-screen" class="hidden h-full flex flex-col">
+            
+            <!-- Navbar (Profile-based) -->
+            <nav class="bg-gray-800 shadow-sm border-b border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-16">
+                        <div class="flex items-center">
+                            <span class="text-2xl font-bold text-indigo-400">Present OS</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span id="user-profile-name" class="font-medium text-gray-300 mr-3 hidden sm:block">User Name</span>
+                            <img id="user-profile-pic" class="w-10 h-10 rounded-full mr-4" src="https://placehold.co/40x40/374151/9CA3AF?text=User" alt="User Profile">
+                            <button id="sign-out-btn" title="Sign Out" class="p-2 bg-gray-700 text-gray-400 rounded-lg hover:bg-gray-600 hover:text-white transition">
+                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 p-4 md:p-8 bg-gray-900 overflow-y-auto">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <!-- Column 1: My Goals (Purpose) -->
+                    <div class="lg:col-span-1 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+                        <h2 class="text-2xl font-bold text-white mb-6">My Goals (Purpose)</h2>
+                        
+                        <!-- Add Goal Form -->
+                        <form id="add-goal-form" class="mb-6 pb-6 border-b border-gray-700">
+                            <h3 class="text-lg font-semibold mb-3 text-white">Add New Goal</h3>
+                            <div class="space-y-4">
+                                <input id="goal-name" type="text" placeholder="Goal Name (e.g., Get Healthy)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input id="goal-avatar" type="text" placeholder="Avatar (e.g., Warrior)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center justify-center">
+                                    <i data-lucide="plus" class="w-5 h-5 mr-2"></i>
+                                    Add Goal
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Goal List -->
+                        <div id="goals-list" class="space-y-4">
+                            <!-- Goals will be injected here by JS -->
+                            <p class="text-gray-400">Loading goals...</p>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Schedule Action (Action) -->
+                    <div class="lg:col-span-2 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+                        <h2 class="text-2xl font-bold text-white mb-6">Schedule an Action</h2>
+                        
+                        <form id="schedule-action-form" class="space-y-6">
+                            <textarea id="task-prompt" placeholder="What's the task? (e.g., Go to the gym for 1 hour tomorrow)" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3"></textarea>
+                            
+                            <div>
+                                <label for="goal-select" class="block text-sm font-medium text-gray-300 mb-2">Select a Goal:</label>
+                                <select id="goal-select" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="">Select a goal</option>
+                                    <!-- Goal options will be injected here by JS -->
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Select Personality (PAEI):</label>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                    <button type="button" data-personality="P" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 focus:bg-indigo-600 focus:text-white transition bg-indigo-600">P (Producer)</button>
+                                    <button type="button" data-personality="A" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 focus:bg-indigo-600 focus:text-white transition">A (Admin)</button>
+                                    <button type="button" data-personality="E" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 focus:bg-indigo-600 focus:text-white transition">E (Entrepreneur)</button>
+                                    <button type="button" data-personality="I" class="personality-btn p-3 border border-gray-600 rounded-lg font-semibold text-gray-300 hover:bg-gray-700 focus:bg-indigo-600 focus:text-white transition">I (Integrator)</button>
+                                </div>
+                            </div>
+                            
+                            <p id="permission-status" class="text-yellow-500 text-sm">Checking calendar connection...</p>
+
+                            <button type="submit" class="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition flex items-center justify-center text-lg">
+                                <i data-lucide="calendar-plus" class="w-5 h-5 mr-2"></i>
+                                Schedule Action
+                            </button>
+                            
+                            <div id="schedule-status" class="mt-2 text-sm">
+                                <!-- Success/Error messages will be injected here -->
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+</body>
+</html>

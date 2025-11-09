@@ -1,0 +1,15 @@
+/* This file is for simple, global styles that Tailwind doesn't handle by default.
+We'll use it to manage our "screen" visibility.
+*/
+
+#login-screen.hidden,
+#dashboard-screen.hidden {
+    display: none;
+}
+
+/* A helper class to show a selected personality button */
+.personality-button.selected {
+    background-color: #DBEAFE; /* Tailwind's blue-100 */
+    border-color: #2563EB; /* Tailwind's blue-600 */
+    color: #1E40AF; /* Tailwind's blue-800 */
+}

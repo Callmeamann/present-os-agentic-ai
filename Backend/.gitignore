@@ -1,0 +1,33 @@
+test_auth.py
+
+--- Secrets ---
+.env
+
+--- Python ---
+.venv/
+venv/
+env/
+
+
+pycache/
+*.pyc
+*.pyoc
+*.pyd
+
+--- OS / IDE ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+--- Testing & Coverage ---
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+--- Build Artifacts ---
+
+dist/
+build/
+*.egg-info/

@@ -1,0 +1,24 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+email-validator 
+python-dotenv
+
+# Google & Firebase
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+firebase-admin
+
+# AI
+
+google-generativeai
+
+# Security
+
+cryptography
+
+# CORS
+
+fastapi-cors
